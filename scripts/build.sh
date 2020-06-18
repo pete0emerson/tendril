@@ -15,7 +15,7 @@ buildInstallMethod=make
 mkdir -p bin
 
 for app in $(ls cmd) ; do
-	cd cmd/$app\
+	cd cmd/$app
 	go build\
 		-a -ldflags "-X 'main.buildDate=${buildDate}'
 		-X 'main.buildHash=${buildHash}'
@@ -23,4 +23,5 @@ for app in $(ls cmd) ; do
 		-X 'main.buildOS=${buildOS}'
 		-X 'main.buildInstallMethod=${buildInstallMethod}'" \
 		-o ../../bin/$app
+	cd ..
 done

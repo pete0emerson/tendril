@@ -107,7 +107,7 @@ func main() {
 	rootCmd.Flags().CountVarP(&verbose, "verbose", "v", "verbose output")
 	rootCmd.Execute()
 
-	commands := getDynamicCobraCommands("examples/commands")
+	commands := getDynamicCobraCommands("./tendril/commands")
 
 	for _, cmd := range commands {
 		if verbose > 0 {

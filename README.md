@@ -8,6 +8,7 @@ A command-line interface that aggregates your operations commands across your ap
 git clone https://github.com/pete0emerson/tendril.git
 cd tendril
 make
+cp -R examples tendril
 bin/tendril
 ```
 

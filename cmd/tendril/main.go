@@ -125,7 +125,7 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 					Long:  longHelp,
 					Run: func(cmd *cobra.Command, args []string) {
 						if verbose > 0 {
-							fmt.Printf("Running: %s\n", fullPath)
+							log.Printf("Running: %s\n", fullPath)
 						}
 						c := exec.Command(fullPath, strings.Join(args, " "))
 						c.Stdout = os.Stdout
@@ -143,7 +143,7 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 					},
 				}
 				if verbose > 1 {
-					fmt.Printf("commands[%s] = %#v\n", name, command)
+					log.Printf("commands[%s] = %#v\n", name, command)
 				}
 				commands[name] = command
 			} else {

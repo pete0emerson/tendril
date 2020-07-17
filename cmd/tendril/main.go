@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v1"
 
 	"github.com/spf13/cobra"
 )
@@ -20,14 +21,60 @@ var rootCmd = &cobra.Command{
 	TraverseChildren: true,
 }
 
+type Command struct {
+	Short string `yaml:"short"`
+	Long  string `yaml:"long"`
+}
+
+func loadYAMLFile(filename string) (Command, error) {
+	var command Command
+	yamlFile, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return command, err
+	}
+	err = yaml.Unmarshal(yamlFile, &command)
+	if err != nil {
+		return command, fmt.Errorf("Unmarshal: %v", err)
+	}
+	return command, nil
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
+
 func getHelp(file string) (shortHelp, longHelp string, err error) {
 	if verbose > 0 {
-		log.Printf("Getting help for %s\n", file)
+		log.Printf("Getting help for %s", file)
 	}
-	shortHelp = "short"
-	longHelp = "long"
-	err = nil
-	return
+	helpFile := fmt.Sprintf("%s.yaml", file)
+	if fileExists(helpFile) {
+		// Load the help file if it exists
+		if verbose > 0 {
+			log.Printf("Loading help from %s", helpFile)
+		}
+		c, err := loadYAMLFile(helpFile)
+		if err != nil {
+			return "", "", err
+		}
+		return c.Short, c.Long, nil
+	} else {
+		// Otherwise we run the script, passing tendril-help to it to get the help yaml
+		out, err := exec.Command(file, "tendril-help").Output()
+		if err != nil {
+			return "", "", err
+		}
+		var c Command
+		err = yaml.Unmarshal(out, &c)
+		if err != nil {
+			return "", "", err
+		}
+		return c.Short, c.Long, nil
+	}
 }
 
 func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
@@ -43,6 +90,9 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 	}
 	for _, f := range files {
 		name := f.Name()
+		if strings.HasSuffix(name, ".yaml") {
+			continue
+		}
 		if strings.Contains(name, ".") {
 			nameArray := strings.Split(f.Name(), ".")
 			name = strings.Join(nameArray[0:len(nameArray)-1], ".")
@@ -96,6 +146,9 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 					fmt.Printf("commands[%s] = %#v\n", name, command)
 				}
 				commands[name] = command
+			} else {
+				// We may want to fail silently here? Leave it for now.
+				log.Fatal(err)
 			}
 		}
 	}

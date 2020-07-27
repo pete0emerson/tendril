@@ -11,6 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v1"
 
+	"github.com/pete0emerson/spm/pkg/spm"
+
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +26,16 @@ var rootCmd = &cobra.Command{
 type Command struct {
 	Short string `yaml:"short"`
 	Long  string `yaml:"long"`
+}
+
+func setVerbose() {
+	if verbose == 0 {
+		log.SetLevel(log.FatalLevel)
+	} else if verbose == 1 {
+		log.SetLevel(log.InfoLevel)
+	} else {
+		log.SetLevel(log.DebugLevel)
+	}
 }
 
 func loadYAMLFile(filename string) (Command, error) {
@@ -156,6 +168,8 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 	return commands
 }
 
+var operatorForce bool
+
 func main() {
 	rootCmd.Flags().CountVarP(&verbose, "verbose", "v", "verbose output")
 	rootCmd.Execute()
@@ -168,6 +182,43 @@ func main() {
 		}
 		rootCmd.AddCommand(cmd)
 	}
-	rootCmd.Execute()
 
+	var operatorCommand = &cobra.Command{
+		Use: "operator",
+	}
+
+	var operatorInstallCommand = &cobra.Command{
+		Use:   "install",
+		Short: "Install package",
+		Long:  "Install package",
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			setVerbose()
+			err := spm.Install(args[0], args[1], operatorForce)
+			if err != nil {
+				log.Fatal(err)
+			}
+		},
+	}
+
+	var operatorRemoveCommand = &cobra.Command{
+		Use:   "remove",
+		Short: "Remove package",
+		Long:  "Remove package",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			setVerbose()
+			err := spm.Remove(args[0], operatorForce)
+			if err != nil {
+				log.Fatal(err)
+			}
+		},
+	}
+
+	operatorInstallCommand.Flags().BoolVarP(&operatorForce, "force", "f", false, "Force install")
+	operatorRemoveCommand.Flags().BoolVarP(&operatorForce, "force", "f", false, "Force remove")
+	operatorCommand.AddCommand(operatorInstallCommand)
+	operatorCommand.AddCommand(operatorRemoveCommand)
+	rootCmd.AddCommand(operatorCommand)
+	rootCmd.Execute()
 }

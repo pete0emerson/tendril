@@ -17,7 +17,7 @@ mkdir -p bin
 for app in $(ls cmd) ; do
 	cd cmd/$app
 	go build\
-		-a -ldflags "-X 'main.buildDate=${buildDate}'
+		-ldflags "-X 'main.buildDate=${buildDate}'
 		-X 'main.buildHash=${buildHash}'
 		-X 'main.buildVersion=${buildVersion}'
 		-X 'main.buildOS=${buildOS}'

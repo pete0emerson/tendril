@@ -4,6 +4,9 @@ build:	## Build the binaries
 install:	## Install the binaries
 	@scripts/install.sh
 
+fmt:		## Run go fmt
+	go fmt cmd/tendril/*.go
+
 help:	## Show this help
 
 .PHONY: build help

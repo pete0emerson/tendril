@@ -61,13 +61,14 @@ func fileExists(filename string) bool {
 
 func getHelp(file string) (shortHelp, longHelp string, err error) {
 	if verbose > 0 {
-		log.Printf("Getting help for %s", file)
+		log.Debugf("Getting help for %s", file)
 	}
 	helpFile := fmt.Sprintf("%s.yaml", file)
+	log.Debugf("Looking for %s", helpFile)
 	if fileExists(helpFile) {
 		// Load the help file if it exists
 		if verbose > 0 {
-			log.Printf("Loading help from %s", helpFile)
+			log.Debugf("Loading help from %s", helpFile)
 		}
 		c, err := loadYAMLFile(helpFile)
 		if err != nil {
@@ -90,12 +91,18 @@ func getHelp(file string) (shortHelp, longHelp string, err error) {
 }
 
 func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
-	if verbose > 0 {
-		log.Printf("Loading dynamic commands from %s\n", dir)
-	}
+	log.Infof("Loading dynamic commands from %s\n", dir)
 	var commands map[string]*cobra.Command
 	commands = make(map[string]*cobra.Command)
 
+	fi, err := os.Stat(dir)
+	if err != nil {
+		return nil
+	}
+	mode := fi.Mode()
+	if !mode.IsDir() {
+		return nil
+	}
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
@@ -110,25 +117,33 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 			name = strings.Join(nameArray[0:len(nameArray)-1], ".")
 		}
 		fullPath := dir + "/" + f.Name()
-		if verbose > 0 {
-			log.Infof("Considering %s\n", fullPath)
-		}
+		log.Debugf("Considering %s\n", fullPath)
 		if f.IsDir() {
-			if verbose > 0 {
-				log.Infof("Recursing down %s\n", fullPath)
-			}
+			log.Debugf("Recursing down %s\n", fullPath)
+			shortHelp, longHelp, _ := getHelp(fullPath)
 			nextLevelCommands := getDynamicCobraCommands(fullPath)
 			command := &cobra.Command{
-				Use: name,
+				Use:   name,
+				Short: shortHelp,
+				Long:  longHelp,
 			}
 			for _, nextComm := range nextLevelCommands {
 				command.AddCommand(nextComm)
 			}
 			commands[name] = command
 		} else {
-			if verbose > 0 {
-				log.Infof("Added command: %s\n", name)
+
+			fi, err := os.Stat(fullPath)
+			if err != nil {
+				log.Fatal(err)
 			}
+			mode := fi.Mode()
+			if mode&0111 == 0 {
+				log.Debugf("Rejecting non-executable %s\n", fullPath)
+				continue
+			}
+
+			log.Debugf("Added command: %s\n", name)
 			shortHelp, longHelp, err := getHelp(fullPath)
 			if err == nil {
 				var command = &cobra.Command{
@@ -136,9 +151,8 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 					Short: shortHelp,
 					Long:  longHelp,
 					Run: func(cmd *cobra.Command, args []string) {
-						if verbose > 0 {
-							log.Printf("Running: %s\n", fullPath)
-						}
+						setVerbose()
+						log.Infof("Running: %s\n", fullPath)
 						c := exec.Command(fullPath, strings.Join(args, " "))
 						c.Stdout = os.Stdout
 						c.Stderr = os.Stderr
@@ -153,9 +167,6 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 						}
 
 					},
-				}
-				if verbose > 1 {
-					log.Printf("commands[%s] = %#v\n", name, command)
 				}
 				commands[name] = command
 			} else {
@@ -173,8 +184,9 @@ var operatorForce bool
 func main() {
 	rootCmd.Flags().CountVarP(&verbose, "verbose", "v", "verbose output")
 	rootCmd.Execute()
+	setVerbose()
 
-	commands := getDynamicCobraCommands("./tendril/commands")
+	commands := getDynamicCobraCommands("./tendril")
 
 	for _, cmd := range commands {
 		if verbose > 0 {
@@ -184,13 +196,15 @@ func main() {
 	}
 
 	var operatorCommand = &cobra.Command{
-		Use: "operator",
+		Use:   "operator",
+		Short: "Tendril operator commands",
+		Long:  "Tendril operator commands",
 	}
 
 	var operatorInstallCommand = &cobra.Command{
-		Use:   "install",
-		Short: "Install package",
-		Long:  "Install package",
+		Use:   "install SOURCE DESTINATION",
+		Short: "Install a tendril package",
+		Long:  "Install a tendril package",
 		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			setVerbose()
@@ -203,8 +217,8 @@ func main() {
 
 	var operatorRemoveCommand = &cobra.Command{
 		Use:   "remove",
-		Short: "Remove package",
-		Long:  "Remove package",
+		Short: "Remove a tendril package",
+		Long:  "Remove a tendril package",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			setVerbose()

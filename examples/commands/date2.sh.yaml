@@ -1,7 +1,0 @@
----
-short: Run the date command
-long: |
-
-  This is a trivial example of a tendril command
-
-  This will simply run the unix 'date' command.

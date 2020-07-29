@@ -105,10 +105,6 @@ github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLA
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181zc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
-github.com/pete0emerson/spm v0.0.0-20200727215803-3a53d37930bf h1:k9804nFoO79EKfzBOT1atGdwG15xRk1Yf9rx2Wf3WK8=
-github.com/pete0emerson/spm v0.0.0-20200727215803-3a53d37930bf/go.mod h1:nLsxa8+hTWHBri8iRsEJbtv4lpxF5riiilGga3WN5Vo=
-github.com/pete0emerson/spm v0.0.0-20200727222106-3d7cefbee382 h1:90F+lXIkDz5X86ixEiMvOJAyNEMgec94cE44wqUQq8A=
-github.com/pete0emerson/spm v0.0.0-20200727222106-3d7cefbee382/go.mod h1:nLsxa8+hTWHBri8iRsEJbtv4lpxF5riiilGga3WN5Vo=
 github.com/pete0emerson/spm v0.0.0-20200727222331-0e26a15e8d8e h1:a3rUEnM4KUE1l9ZYLRIfhhUeGuLswMZq57111ba4opM=
 github.com/pete0emerson/spm v0.0.0-20200727222331-0e26a15e8d8e/go.mod h1:nLsxa8+hTWHBri8iRsEJbtv4lpxF5riiilGga3WN5Vo=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

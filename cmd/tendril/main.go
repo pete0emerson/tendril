@@ -182,8 +182,21 @@ func getDynamicCobraCommands(dir string) map[string]*cobra.Command {
 var operatorForce bool
 
 func main() {
-	rootCmd.Flags().CountVarP(&verbose, "verbose", "v", "verbose output")
-	rootCmd.Execute()
+	for _, arg := range os.Args {
+		if arg == "--verbose" || arg == "-v" {
+			verbose++
+		} else if strings.HasPrefix(arg, "-v") {
+			okay := true
+			for _, c := range arg[1:] {
+				if c != 'v' {
+					okay = false
+				}
+			}
+			if okay {
+				verbose += len(arg) - 1
+			}
+		}
+	}
 	setVerbose()
 
 	commands := getDynamicCobraCommands("./tendril")
@@ -208,6 +221,7 @@ func main() {
 		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			setVerbose()
+
 			err := spm.Install(args[0], args[1], operatorForce)
 			if err != nil {
 				log.Fatal(err)
@@ -228,11 +242,11 @@ func main() {
 			}
 		},
 	}
-
 	operatorInstallCommand.Flags().BoolVarP(&operatorForce, "force", "f", false, "Force install")
 	operatorRemoveCommand.Flags().BoolVarP(&operatorForce, "force", "f", false, "Force remove")
 	operatorCommand.AddCommand(operatorInstallCommand)
 	operatorCommand.AddCommand(operatorRemoveCommand)
 	rootCmd.AddCommand(operatorCommand)
+	rootCmd.Flags().CountVarP(&verbose, "verbose", "v", "verbose output")
 	rootCmd.Execute()
 }

@@ -215,12 +215,15 @@ func main() {
 	}
 
 	var operatorInstallCommand = &cobra.Command{
-		Use:   "install SOURCE DESTINATION",
-		Short: "Install a tendril package",
-		Long:  "Install a tendril package",
-		Args:  cobra.ExactArgs(2),
+		Use:   "install SOURCE [DESTINATION]",
+		Short: "Install a tendril package to DESTINATION (default ./tendril)",
+		Long:  "Install a tendril package to DESTINATION (default ./tendril)",
+		Args:  cobra.RangeArgs(1, 2),
 		Run: func(cmd *cobra.Command, args []string) {
 			setVerbose()
+			if len(args) == 1 {
+				args = append(args, "./tendril")
+			}
 
 			err := spm.Install(args[0], args[1], operatorForce)
 			if err != nil {

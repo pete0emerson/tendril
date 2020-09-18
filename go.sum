@@ -107,6 +107,8 @@ github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pete0emerson/spm v0.0.0-20200727222331-0e26a15e8d8e h1:a3rUEnM4KUE1l9ZYLRIfhhUeGuLswMZq57111ba4opM=
 github.com/pete0emerson/spm v0.0.0-20200727222331-0e26a15e8d8e/go.mod h1:nLsxa8+hTWHBri8iRsEJbtv4lpxF5riiilGga3WN5Vo=
+github.com/pete0emerson/spm v0.0.0-20200918223127-129f045c518d h1:FYp28JDg5yTGTNoxWJriklz4NyEvX4otICAVQmGSi1A=
+github.com/pete0emerson/spm v0.0.0-20200918223127-129f045c518d/go.mod h1:nLsxa8+hTWHBri8iRsEJbtv4lpxF5riiilGga3WN5Vo=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
